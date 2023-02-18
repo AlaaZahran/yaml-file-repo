@@ -1,0 +1,45 @@
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.101.0/24
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: sa-east-1a
+      CidrBlock: 192.168.101.0/28
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: sa-east-1b
+      CidrBlock: 192.168.101.32/28
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref VPC
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh to ec2
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+  WebAppInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      ImageId: ami-01fc9174dd9330556
+      InstanceType: t2.micro
+      Tags:
+        - Key: name
+          Value: alaa-ec2
+      KeyName: alaa
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
